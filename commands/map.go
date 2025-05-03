@@ -25,24 +25,21 @@ func CommandMap(c *types.Config) error {
 		pageToLookFor = string(c.Next)
 	}
 
-	res, err := http.Get(pageToLookFor)
-	if err != nil {
-		return errors.New("error calling API")
-	}
-
-	body, err := io.ReadAll(res.Body)
-	defer res.Body.Close()
-	if err != nil {
-		return fmt.Errorf("error while unmarshaling: %s", err)
-	}
-	if res.StatusCode > 299 {
-		return fmt.Errorf("response failed with status code: %d and\nbody: %s", res.StatusCode, body)
-	}
-
 	var responseJson types.LocationsPageResponse
-	err = json.Unmarshal(body, &responseJson)
+
+	body, found := c.CacheMap.Get(pageToLookFor)
+	if !found {
+		err, body := callPokeAPIGetLocation(pageToLookFor)
+		if err != nil {
+			return err
+		}
+
+		c.CacheMap.Add(pageToLookFor, body)
+	}
+
+	err := unmarshalBodyJson(body, &responseJson)
 	if err != nil {
-		return fmt.Errorf("error while unmarshaling: %s", err)
+		return err
 	}
 
 	if responseJson.Previous == "" && c.Option == "previous" {
@@ -57,5 +54,32 @@ func CommandMap(c *types.Config) error {
 		fmt.Println(location.Name)
 	}
 
+	return nil
+}
+
+func callPokeAPIGetLocation(pageToLookFor string) (error, []byte) {
+
+	res, err := http.Get(pageToLookFor)
+	if err != nil {
+		return errors.New("error calling API"), nil
+	}
+
+	body, err := io.ReadAll(res.Body)
+	defer res.Body.Close()
+	if err != nil {
+		return fmt.Errorf("error while unmarshaling: %s", err), nil
+	}
+	if res.StatusCode > 299 {
+		return fmt.Errorf("response failed with status code: %d and\nbody: %s", res.StatusCode, body), nil
+	}
+
+	return nil, body
+}
+
+func unmarshalBodyJson(body []byte, responseJson *types.LocationsPageResponse) error {
+	err := json.Unmarshal(body, &responseJson)
+	if err != nil {
+		return fmt.Errorf("error while unmarshaling: %s", err)
+	}
 	return nil
 }

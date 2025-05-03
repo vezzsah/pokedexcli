@@ -1,11 +1,14 @@
 package types
 
+import "github.com/vezzsah/pokedexcli/pokecache"
+
 type URL string
 
 type Config struct {
 	Next     URL
 	Previous URL
 	Option   string
+	CacheMap *pokecache.Cache
 }
 
 type CliCommand struct {
