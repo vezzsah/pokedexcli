@@ -19,6 +19,7 @@ func CommandBMap(c *types.Config) error {
 
 func CommandMap(c *types.Config) error {
 	var pageToLookFor string
+	var err error
 	if c.Option == "previous" {
 		pageToLookFor = string(c.Previous)
 	} else {
@@ -29,7 +30,7 @@ func CommandMap(c *types.Config) error {
 
 	body, found := c.CacheMap.Get(pageToLookFor)
 	if !found {
-		err, body := callPokeAPIGetLocation(pageToLookFor)
+		body, err = callPokeAPIGetLocation(pageToLookFor)
 		if err != nil {
 			return err
 		}
@@ -37,7 +38,7 @@ func CommandMap(c *types.Config) error {
 		c.CacheMap.Add(pageToLookFor, body)
 	}
 
-	err := unmarshalBodyJson(body, &responseJson)
+	err = unmarshalBodyJson(body, &responseJson)
 	if err != nil {
 		return err
 	}
@@ -57,29 +58,29 @@ func CommandMap(c *types.Config) error {
 	return nil
 }
 
-func callPokeAPIGetLocation(pageToLookFor string) (error, []byte) {
+func callPokeAPIGetLocation(pageToLookFor string) ([]byte, error) {
 
 	res, err := http.Get(pageToLookFor)
 	if err != nil {
-		return errors.New("error calling API"), nil
+		return nil, errors.New("error calling API")
 	}
 
 	body, err := io.ReadAll(res.Body)
 	defer res.Body.Close()
 	if err != nil {
-		return fmt.Errorf("error while unmarshaling: %s", err), nil
+		return nil, fmt.Errorf("error while readying body: %s", err)
 	}
 	if res.StatusCode > 299 {
-		return fmt.Errorf("response failed with status code: %d and\nbody: %s", res.StatusCode, body), nil
+		return nil, fmt.Errorf("response failed with status code: %d and\nBody: %s", res.StatusCode, body)
 	}
 
-	return nil, body
+	return body, nil
 }
 
 func unmarshalBodyJson(body []byte, responseJson *types.LocationsPageResponse) error {
 	err := json.Unmarshal(body, &responseJson)
 	if err != nil {
-		return fmt.Errorf("error while unmarshaling: %s", err)
+		return fmt.Errorf("error while unmarshaling: %s\nBody: %s", err, string(body))
 	}
 	return nil
 }
