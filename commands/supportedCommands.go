@@ -26,5 +26,10 @@ func InitiateSupportedCommands(supportedCommands *map[string]types.CliCommand) {
 			Description: "It displays the Names of the prev 20 location areas in the Pokemon world. Each subsequent call to map should display the prev 20 locations, and so on",
 			Callback:    CommandBMap,
 		},
+		"explore": {
+			Name:        "explore",
+			Description: "Show the pokemon located in the given area",
+			Callback:    CommandExplore,
+		},
 	}
 }

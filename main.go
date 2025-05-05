@@ -23,10 +23,11 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	var userInput []string
 	conf := types.Config{
-		Next:     types.PokeapiLocationUrl,
-		Previous: "",
-		Option:   "",
-		CacheMap: cache,
+		Next:       types.PokeapiLocationAreaUrl,
+		Previous:   "",
+		Option:     "",
+		CacheMap:   cache,
+		Parameters: "",
 	}
 
 	for {
@@ -37,14 +38,21 @@ func main() {
 		}
 		userInput = cleanInput(scanner.Text())
 
+		if len(userInput) >= 2 {
+			conf.Parameters = userInput[1]
+		}
+
 		command, ok := supportedCommands[userInput[0]]
 		if !ok {
 			fmt.Println("Unknown command")
 			continue
 		}
 
+		//fmt.Printf("Executing Command: %s\nParameter: %s\n", command.Name, conf.Parameters)
+
 		err := command.Callback(&conf)
 		if err != nil {
+			//fmt.Println(err)
 			log.Fatal(err)
 		}
 	}
