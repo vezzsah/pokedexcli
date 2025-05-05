@@ -31,5 +31,10 @@ func InitiateSupportedCommands(supportedCommands *map[string]types.CliCommand) {
 			Description: "Show the pokemon located in the given area",
 			Callback:    CommandExplore,
 		},
+		"catch": {
+			Name:        "catch",
+			Description: "Try to catch the requested pokemon",
+			Callback:    CommandCatch,
+		},
 	}
 }

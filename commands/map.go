@@ -26,7 +26,7 @@ func CommandMap(c *types.Config) error {
 
 	body, found := c.CacheMap.Get(pageToLookFor)
 	if !found {
-		body, err = callPokeAPIGetLocation(pageToLookFor)
+		body, err = callPokeAPIGet(pageToLookFor)
 		if err != nil {
 			return err
 		}

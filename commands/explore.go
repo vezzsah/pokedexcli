@@ -15,10 +15,10 @@ func CommandExplore(c *types.Config) error {
 		return nil
 	}
 
-	locationToSearch := string(types.PokeapiAreaUrl) + c.Parameters
+	locationToSearch := string(types.PokeapiLocationAreaUrl) + c.Parameters
 	body, found := c.CacheMap.Get(locationToSearch)
 	if !found {
-		body, err = callPokeAPIGetLocation(locationToSearch)
+		body, err = callPokeAPIGet(locationToSearch)
 		if err != nil {
 			return err
 		}

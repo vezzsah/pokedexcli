@@ -23,11 +23,12 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	var userInput []string
 	conf := types.Config{
-		Next:       types.PokeapiLocationAreaUrl,
-		Previous:   "",
-		Option:     "",
-		CacheMap:   cache,
-		Parameters: "",
+		Next:          types.PokeapiLocationAreaUrl,
+		Previous:      "",
+		Option:        "",
+		CacheMap:      cache,
+		Parameters:    "",
+		PokemonCaught: make(map[string]types.PokemonPageResponse),
 	}
 
 	for {

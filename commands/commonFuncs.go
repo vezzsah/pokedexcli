@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/vezzsah/pokedexcli/types"
 )
 
 func unmarshalBodyJson[T any](body []byte, responseJson T) error {
@@ -16,9 +18,9 @@ func unmarshalBodyJson[T any](body []byte, responseJson T) error {
 	return nil
 }
 
-func callPokeAPIGetLocation(pageToLookFor string) ([]byte, error) {
+func callPokeAPIGet(apiURL string) ([]byte, error) {
 
-	res, err := http.Get(pageToLookFor)
+	res, err := http.Get(apiURL)
 	if err != nil {
 		return nil, errors.New("error calling API")
 	}
@@ -29,8 +31,29 @@ func callPokeAPIGetLocation(pageToLookFor string) ([]byte, error) {
 		return nil, fmt.Errorf("error while readying body: %s", err)
 	}
 	if res.StatusCode > 299 {
-		return nil, fmt.Errorf("response failed with status code: %d and\nBody: %s", res.StatusCode, body)
+		return nil, fmt.Errorf("response failed with status code: %d\n URL = %s\nBody: %s", res.StatusCode, apiURL, body)
 	}
 
 	return body, nil
+}
+
+func GetAPICallFromCache[T any](c *types.Config, url types.URL, responseJson *T) error {
+	var err error
+	apiURL := string(url) + c.Parameters
+	body, found := c.CacheMap.Get(apiURL)
+	if !found {
+		body, err = callPokeAPIGet(apiURL)
+		if err != nil {
+			return err
+		}
+
+		c.CacheMap.Add(apiURL, body)
+	}
+
+	err = unmarshalBodyJson(body, &responseJson)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
