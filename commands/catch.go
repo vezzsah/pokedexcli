@@ -27,9 +27,9 @@ func CommandCatch(c *types.Config) error {
 
 	pokemonName := responseJson.Name
 	catchRate := 60 - responseJson.BaseExpirience/10
-	fmt.Printf("Throwing a Pokeball at %s\n", pokemonName)
+	fmt.Printf("Throwing a Pokeball at %s...\n", pokemonName)
 	if catchRate >= rand.Intn(100) {
-		fmt.Printf("%s was caught!\n", pokemonName)
+		fmt.Printf("%s was caught!\nYou may now inspect it with the inspect command.\n", pokemonName)
 		c.PokemonCaught[pokemonName] = responseJson
 	} else {
 		fmt.Printf("%s escaped!\n", pokemonName)

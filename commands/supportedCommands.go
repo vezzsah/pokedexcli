@@ -36,5 +36,15 @@ func InitiateSupportedCommands(supportedCommands *map[string]types.CliCommand) {
 			Description: "Try to catch the requested pokemon",
 			Callback:    CommandCatch,
 		},
+		"inspect": {
+			Name:        "inspect",
+			Description: "Inspect the catched pokemon",
+			Callback:    CommandInspect,
+		},
+		"pokedex": {
+			Name:        "pokedex",
+			Description: "Inspect your pokemon team",
+			Callback:    CommandPokedex,
+		},
 	}
 }
